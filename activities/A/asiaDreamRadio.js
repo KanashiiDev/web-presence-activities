@@ -4,7 +4,7 @@ registerParser({
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
   title: "Asia Dream Radio",
-  version: "1.0.0",
+  version: "1.0.1",
   description: "Online radio focused on J-Pop, Asian hits, and Japanese music.",
   category: "radio",
   tags: ["jpop", "asia"],
@@ -41,10 +41,13 @@ registerParser({
 
     function getPageSongInfo() {
       const main = document.querySelector(".sc-status-widget");
+      const metaText = main.querySelector(".track_st_track-meta")?.textContent || "";
+      const [artist, title] = metaText.split("-").map((item) => item.trim());
+
       if (!main) return null;
       return {
-        title: main.querySelector(".track_st_track-meta").textContent,
-        artist: main.querySelector(".track_st_track-meta").textContent,
+        title: title || "",
+        artist: artist || "",
         cover: main.querySelector("img").src,
         duration: main.querySelector(".track_st_progress-text")?.textContent,
       };
