@@ -4,17 +4,17 @@ registerParser({
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
   title: "YouTube Music",
-  version: "1.0.0",
+  version: "1.0.1",
   description: "Music streaming service with official tracks, remixes, and video integration.",
   category: "platform",
   tags: [],
   urlPatterns: [/.*/],
   fn: function () {
     const songLink = document.querySelector("#movie_player .ytp-title a")?.href;
-    const title = getText(".ytmusic-player-bar yt-formatted-string:first-child");
+    const title = getText(".ytmusic-player-bar yt-formatted-string:first-child") || getText("ytmusic-track-info .ytmusicTrackInfoTitle");
 
     let artist = "";
-    const artistSelector = document.querySelector("ytmusic-player-bar yt-formatted-string.byline");
+    const artistSelector = document.querySelector("ytmusic-player-bar yt-formatted-string.byline") || document.querySelector("ytmusic-track-info .ytmusicTrackInfoBylineItem span");
     if (artistSelector) {
       const artistNames = [];
       let foundAnchor = false;
@@ -39,8 +39,8 @@ registerParser({
     }
 
     const video = document.querySelector("video");
-    let timePassed = getText("#left-controls .time-info") || "";
-    let duration = getText("#left-controls .time-info") || "";
+    let timePassed = getText("#left-controls .time-info") || getText(".ytMusicMiniPlayerTimeInfo") || "";
+    let duration = getText("#left-controls .time-info") || getText(".ytMusicMiniPlayerTimeInfo") || "";
     let isWatching = 0;
     if (video) {
       isWatching = !video.paused;
@@ -52,8 +52,10 @@ registerParser({
     const image = vid ? `https://i.ytimg.com/vi/${vid}/mqdefault.jpg` : null;
     const source = "YouTube Music";
     const songUrl = songLink || window.location.href;
+
     const pathNodes = document.querySelectorAll(".ytmusic-player-bar #button > yt-icon > span > div > svg > path");
-    const playPath = pathNodes?.[2]?.getAttribute("d") || null;
+    const newPathNodes = document.querySelector(".ytmusicPlayerControlsMainControls .ytSpecButtonShapeNextTonal path");
+    const playPath = newPathNodes ? newPathNodes.getAttribute("d") : pathNodes?.[2]?.getAttribute("d") || null;
     const isPlaying = isWatching || (typeof playPath === "string" && playPath.startsWith("M6.5"));
   },
 });
