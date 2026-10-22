@@ -4,7 +4,7 @@ registerParser({
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
   title: "YouTube",
-  version: "1.0.1",
+  version: "1.0.2",
   description: "Video-sharing platform hosting music, live streams, and other content.",
   category: ["video", "platform"],
   tags: [],
@@ -12,9 +12,63 @@ registerParser({
   urlPatterns: [/\/watch.*/],
   fn: function () {
     //@world main
+    // Initialize persistent caches on window for the main YouTube loop environment
+    if (!window._ytVideoCache) window._ytVideoCache = new Map();
+    if (!window._ytVideoCacheLoading) window._ytVideoCacheLoading = new Set();
+    if (!window._ytVideoCacheFailed) window._ytVideoCacheFailed = new Set();
+
+    /**
+     * Fallback function to fetch video details via YouTube Innertube API.
+     * Registered globally to persist across interval executions.
+     */
+    if (!window._fetchVideoDataApi) {
+      window._fetchVideoDataApi = async function (id) {
+        if (!id || window._ytVideoCache.has(id) || window._ytVideoCacheLoading.has(id) || window._ytVideoCacheFailed.has(id)) return;
+
+        const config = window.yt?.config_;
+        const apiKey = config?.INNERTUBE_API_KEY;
+        const clientName = config?.INNERTUBE_CLIENT_NAME || "WEB";
+        const clientVersion = config?.INNERTUBE_CLIENT_VERSION || "2.20261015.01.00";
+
+        if (!apiKey) return;
+
+        window._ytVideoCacheLoading.add(id);
+        try {
+          const res = await fetch(`https://www.youtube.com/youtubei/v1/player?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              videoId: id,
+              context: {
+                client: { clientName, clientVersion },
+              },
+            }),
+          });
+
+          if (!res.ok) {
+            window._ytVideoCacheFailed.add(id);
+            return;
+          }
+
+          const json = await res.json();
+          if (json && json.videoDetails) {
+            window._ytVideoCache.set(id, json);
+          } else {
+            window._ytVideoCacheFailed.add(id);
+          }
+        } catch (err) {
+          window._ytVideoCacheFailed.add(id);
+        } finally {
+          window._ytVideoCacheLoading.delete(id);
+        }
+      };
+    }
 
     const url = window.location.href;
 
+    /**
+     * Extracts the current video ID safely from URL search params or pathnames.
+     */
     function getCurrentVideoId() {
       try {
         const urlParams = new URLSearchParams(window.location.search);
@@ -32,6 +86,17 @@ registerParser({
       }
     }
 
+    /**
+     * Helper to safely extract text content from DOM elements.
+     */
+    function getText(selector) {
+      const el = document.querySelector(selector);
+      return el ? el.textContent.trim() : null;
+    }
+
+    /**
+     * Main DOM/Player traversal method to extract internal video metadata.
+     */
     function getVideoData() {
       const currentUrlVideoId = getCurrentVideoId();
       if (!currentUrlVideoId) return null;
@@ -158,23 +223,47 @@ registerParser({
       return null;
     }
 
+    // 1. Attempt to retrieve data via primary DOM/Player mechanism
     let internalData = getVideoData();
+    const videoId = getCurrentVideoId();
+
+    // 2. Fallback execution using window-persisted cache and fetch mechanism
+    if (!internalData && videoId) {
+      if (window._ytVideoCache.has(videoId)) {
+        const cached = window._ytVideoCache.get(videoId);
+        if (cached?.videoDetails) {
+          internalData = {
+            videoId: cached.videoDetails.videoId || videoId,
+            title: cached.videoDetails.title || null,
+            author: cached.videoDetails.author || null,
+            isLivePlayback: Boolean(cached.videoDetails.isLiveContent),
+            lengthSeconds: cached.videoDetails.lengthSeconds || null,
+          };
+        }
+      } else {
+        window._fetchVideoDataApi(videoId);
+      }
+    }
+
+    // 3. Extract final variables
     const title = internalData?.title || getText("#title > h1 > yt-formatted-string") || getText("h1 .ytd-watch-metadata");
     const artist = internalData?.author?.replace(" - Topic", "") || getText("#upload-info #text > a") || getText("ytd-channel-name a");
-    const videoId = getCurrentVideoId();
     const source = "YouTube";
     const songUrl = url;
     const image = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : null;
+
     let timePassed = "";
     let duration = "";
     let isWatching = 0;
     const video = document.querySelector("video");
     const isLive = Boolean(internalData?.isLivePlayback || document.querySelector("button.ytp-live-badge")?.offsetParent);
+
     if (video) {
       isWatching = !video.paused;
       timePassed = isLive ? "" : video.currentTime;
       duration = isLive ? "" : video.duration;
     }
+
     const playIconPath = document.querySelector(".ytp-left-controls > button > svg > path")?.getAttribute("d");
     const isPlaying = isWatching || Boolean(playIconPath?.startsWith("M 12"));
   },
