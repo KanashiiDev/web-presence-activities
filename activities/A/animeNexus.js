@@ -4,12 +4,11 @@ registerParser({
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
   title: "Anime Nexus",
-  version: "1.0.1",
+  version: "1.0.2",
   description: "Anime Nexus is your ultimate destination for discovering, streaming, and discussing all things anime.",
-  lastUpdated: "1780442979917",
+  lastUpdated: "1792976196482",
   mode: "watch",
   watchAutoDetect: "enable",
-  homepage: "",
   category: "video",
   tags: ["anime"],
   urlPatterns: [/\/watch\/.*/],
@@ -21,21 +20,11 @@ registerParser({
     },
   },
   fn: async function () {
-    const iframe = await getIframeData();
-    const title = getText("[data-media-player].flex.flex-col h2") || getText("span.text-white.font-medium.text-sm.lg\:text-base.truncate:last-child");
-    const artist = getText("[data-media-player].flex.flex-col h1") || getText("span.text-white.font-medium.text-sm.lg\:text-base.truncate:first-child");
+    const title = getText(".videojs-player .flex.flex-col h2") || getText(".videojs-player .text-left .text-white");
+    const artist = getText(".videojs-player .flex.flex-col h1") || getText(".videojs-player .text-left .text-xs");
     const image = document.querySelector("meta[property='og:image']")?.content || getImage(".active img") || "https://anime.nexus/apple-touch-icon.png";
     const video = document.querySelector("[data-media-player] video");
     const source = "Anime Nexus";
-    const songUrl = location.href;
-
-    let { duration, currentTime, playing } = iframe || {};
-    if (video && !duration) {
-      playing = !video.paused;
-      currentTime = video.currentTime;
-      duration = video.duration;
-    }
-    const timePassed = currentTime;
-    const isPlaying = playing;
+    const link = location.href;
   },
 });
