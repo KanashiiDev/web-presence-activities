@@ -4,12 +4,12 @@ registerParser({
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
   title: "Amazon Prime Video",
-  version: "1.0.1",
+  version: "1.0.2",
   description: "Stream popular movies, TV shows, sports, and live TV.",
   lastUpdated: "1793148796469",
   mode: "watch",
   watchAutoDetect: "disable",
-  category: "video,platform",
+  category: ["video", "platform"],
   urlPatterns: [/.*/],
   fn: async function () {
     // @world main
