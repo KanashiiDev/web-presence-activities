@@ -9,6 +9,7 @@ registerParser({
   category: "platform",
   tags: [],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const player = document.querySelector(".region-bottomBar");
     if (!player) return null;

@@ -9,6 +9,7 @@ registerParser({
   category: "radio",
   tags: [],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const currentChannel = getText(".channel-selector div");
     const channelMap = {

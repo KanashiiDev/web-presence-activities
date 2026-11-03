@@ -8,6 +8,7 @@ registerParser({
   description: "Global on-demand music streaming with playlists and recommendations.",
   category: "platform",
   tags: [],
+  mode: "listen",
   urlPatterns: [/.*/],
   fn: function () {
     let title = document.querySelector("[data-testid='item_title']")?.textContent;

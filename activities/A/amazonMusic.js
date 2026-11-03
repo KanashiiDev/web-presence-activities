@@ -8,6 +8,7 @@ registerParser({
   description: "On-demand music streaming service with songs, playlists, and integrated podcasts.",
   category: "platform",
   tags: [],
+  mode: "listen",
   urlPatterns: [/.*/],
   fn: function () {
     const main = document.querySelector("music-horizontal-item")?.shadowRoot;

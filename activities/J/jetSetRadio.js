@@ -9,6 +9,7 @@ registerParser({
   category: "radio",
   tags: ["retro", "community"],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     if (document.querySelector("#tvFrame")?.style?.visibility !== "hidden") return null;
 

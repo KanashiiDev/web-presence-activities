@@ -9,6 +9,7 @@ registerParser({
   category: "aggregator",
   tags: ["music", "podcast", "radio"],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const player = document.querySelector("body > div > div > div:last-child");
     if (!player) return null;

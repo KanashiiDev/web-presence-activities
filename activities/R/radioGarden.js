@@ -9,6 +9,7 @@ registerParser({
   category: "aggregator",
   tags: [],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const root = document.querySelector("div[class*='_channelTitle_']");
     const title = root?.querySelector("[class*='_title_']")?.textContent;

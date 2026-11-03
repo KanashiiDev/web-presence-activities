@@ -9,6 +9,7 @@ registerParser({
   category: "radio",
   tags: ["anime", "japan", "community"],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const isPlaying = Boolean(
       document.querySelector("#stream-play-pause")?.textContent.startsWith("Stop") ||

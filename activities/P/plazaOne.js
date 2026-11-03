@@ -9,6 +9,7 @@ registerParser({
   category: "radio",
   tags: ["vaporwave", "retro"],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const timeElem = getText(".player-time");
     const title = getText(".track-title");

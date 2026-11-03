@@ -9,6 +9,7 @@ registerParser({
   category: "aggregator",
   tags: [],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: async function () {
     async function fetchTrackHistory() {
       const stationLink = document.querySelector(".player__station__title a");

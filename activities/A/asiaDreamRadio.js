@@ -8,6 +8,7 @@ registerParser({
   description: "Online radio focused on J-Pop, Asian hits, and Japanese music.",
   category: "radio",
   tags: ["jpop", "asia"],
+  mode: "listen",
   urlPatterns: [/stations.*/],
   fn: async function () {
     function isoToTimeString(iso) {

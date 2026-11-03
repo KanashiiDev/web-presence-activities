@@ -9,6 +9,7 @@ registerParser({
   category: "aggregator",
   tags: [],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const meta = getText("#metadataDisplay").split(" - ");
     let artist = meta[0] || "";

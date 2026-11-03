@@ -7,8 +7,9 @@ registerParser({
   version: "1.0.0",
   description: "High-fidelity on-demand music streaming service.",
   category: "platform",
-  tags: [],
+  tags: ["music", "streaming"],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     const main = document.querySelector("[data-test='footer-player']");
     const title = main?.querySelector("[data-test='footer-track-title']")?.innerText ?? "";

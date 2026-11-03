@@ -9,6 +9,7 @@ registerParser({
   category: "aggregator",
   tags: [],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: function () {
     function getStemFromUrl(input) {
       if (typeof input !== "string") return "";

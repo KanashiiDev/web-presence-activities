@@ -8,6 +8,7 @@ registerParser({
   description: "Free online radio platform with hundreds of curated music channels across genres.",
   category: "radio",
   tags: [],
+  mode: "listen",
   urlPatterns: [/.*/],
   fn: function () {
     const player = document.querySelector("#playerContents");
