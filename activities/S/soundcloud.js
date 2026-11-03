@@ -3,12 +3,13 @@ registerParser({
   domain: "soundcloud.com",
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
-  title: "Soundcloud",
-  version: "1.0.0",
+  title: "SoundCloud",
+  version: "1.0.1",
   description: "Community platform for discovering and sharing independent music uploads.",
   category: "platform",
-  tags: ["community"],
+  tags: ["community", "music", "streaming"],
   urlPatterns: [/.*/],
+  mode: "listen",
   fn: async function () {
     if (document.querySelector(".fullScreenOverlay")) return;
 
