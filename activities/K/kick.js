@@ -4,7 +4,7 @@ registerParser({
   authors: "kanashiiDev",
   authorsLinks: "https://github.com/KanashiiDev",
   title: "Kick",
-  version: "1.0.2",
+  version: "1.0.3",
   description: "Kick is a streaming platform that makes it easy for you to find and watch your favorite content.",
   mode: "watch",
   category: "platform",
@@ -12,8 +12,8 @@ registerParser({
   urlPatterns: [/\/.+/],
   fn: function () {
     const title = getText("[data-testid='livestream-title']");
-    const artist = getText("#channel-username");
-    const image = getImage("div:nth-child(1) > #channel-avatar") || "https://www.google.com/s2/favicons?domain=kick.com&size=64";
+    const artist = getText("[data-testid='channel-username']");
+    const image = getImage("[data-testid='channel-avatar']") || "https://www.google.com/s2/favicons?domain=kick.com&sz=128";
     const video = document.querySelector("#injected-channel-player video");
     const rawCurrentTime = video?.currentTime;
     const rawDuration = video?.duration;
