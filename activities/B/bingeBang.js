@@ -4,38 +4,30 @@ registerParser({
   authors: ["rwr97"],
   authorsLinks: ["https://steamcommunity.com/id/rwr97/"],
   title: "BingeBang",
-  version: "1.6.0",
+  version: "1.6.1",
   description: "Movie and TV playback detection",
-  lastUpdated: "1794781374036",
+  lastUpdated: "1794782700000",
   mode: "watch",
   watchAutoDetect: "enable",
   homepage: "https://bingebang.club/",
   category: ["video", "aggregator"],
   tags: ["bingebang", "movies", "series", "video", "streaming"],
-  urlPatterns: [/movie/play/.*/, /tv/play/.*/],
+  urlPatterns: [/movie\/play\/.*/, /tv\/play\/.*/],
   fn: async function () {
 
     /*
      * BINGEBANG — WEB PRESENCE FOR DISCORD
-     * Version 1.6
+     * Version 1.6.1
      *
-     * DOMAINS:
-     * bingebang.sx
-     * bingebang.st
-     * bingebang.club
-     * bingebang.to
-     * bingebang.pw
-     *
-     * DISCORD:
      * Activity: Watching BingeBang
-     * Title: Movie / Series title
+     * Details: Movie / Series title
      * State: S01 · E01 (TV only)
      *
-     * ARTWORK PRIORITY:
+     * Artwork priority:
      * 1. Official TMDB title logo
      * 2. TMDB title backdrop
      *
-     * Discord artwork: 512x512 square.
+     * Square artwork: 512x512.
      */
 
     // ====================================
@@ -58,26 +50,23 @@ registerParser({
         if (!value) return "";
 
         return value
-            .replace(/\s*[·|•]\s*(?:Player|BingeBang)\b.*$/i, "")
-            .replace(/\s*[-–—]\s*(?:Player|BingeBang)\b.*$/i, "")
+            .replace(/\\s*[·|•]\\s*(?:Player|BingeBang)\\b.*$/i, "")
+            .replace(/\\s*[-–—]\\s*(?:Player|BingeBang)\\b.*$/i, "")
             .replace(
-                /\s*[·|•-]?\s*(?:S\d{1,2}\s*E\d{1,3}|\d{1,2}x\d{1,3})\s*$/i,
+                /\\s*[·|•-]?\\s*(?:S\\d{1,2}\\s*E\\d{1,3}|\\d{1,2}x\\d{1,3})\\s*$/i,
                 ""
             )
-            .replace(
-                /\s+Season\s+\d+\s+Episode\s+\d+.*$/i,
-                ""
-            )
-            .replace(/[\s·|•–—]+$/g, "")
-            .replace(/\s+/g, " ")
+            .replace(/\\s+Season\\s+\\d+\\s+Episode\\s+\\d+.*$/i, "")
+            .replace(/[\\s·|•–—]+$/g, "")
+            .replace(/\\s+/g, " ")
             .trim();
     }
 
     const path = location.pathname;
-    const isSeries = /^\/tv\/play\//i.test(path);
+    const isSeries = /^\\/tv\\/play\\//i.test(path);
 
     const slugMatch = path.match(
-        /^\/(?:movie|tv)\/play\/([^/]+)/i
+        /^\\/(?:movie|tv)\\/play\\/([^/]+)/i
     );
 
     const slug = slugMatch?.[1] || "";
@@ -85,7 +74,7 @@ registerParser({
     const fallbackTitle = slug
         .replace(/-[a-z0-9]{5,}$/i, "")
         .replace(/-/g, " ")
-        .replace(/\b\w/g, c => c.toUpperCase());
+        .replace(/\\b\\w/g, c => c.toUpperCase());
 
     const rawTitle =
         document.querySelector("h1")?.textContent ||
@@ -100,20 +89,14 @@ registerParser({
     // ====================================
 
     const episodeMatch = path.match(
-        /^\/tv\/play\/[^/]+\/(\d{1,2})\/(\d{1,3})\/?$/i
+        /^\\/tv\\/play\\/[^/]+\\/(\\d{1,2})\\/(\\d{1,3})\\/?$/i
     );
 
     let episodeInfo = "";
 
     if (isSeries && episodeMatch) {
-        const season = String(
-            Number(episodeMatch[1])
-        ).padStart(2, "0");
-
-        const episode = String(
-            Number(episodeMatch[2])
-        ).padStart(2, "0");
-
+        const season = String(Number(episodeMatch[1])).padStart(2, "0");
+        const episode = String(Number(episodeMatch[2])).padStart(2, "0");
         episodeInfo = `S${season} · E${episode}`;
     }
 
@@ -128,28 +111,25 @@ registerParser({
             if (!raw) return;
 
             const matches = String(raw).match(
-                /(?:https?:)?\/\/image\.tmdb\.org\/t\/p\/(?:w500|w1280|w1920)\/[^\s"'<>),;]+/gi
+                /(?:https?:)?\\/\\/image\\.tmdb\\.org\\/t\\/p\\/(?:w500|w1280|w1920)\\/[^\\s"'<>),;]+/gi
             ) || [];
 
             for (let match of matches) {
                 try {
-                    if (match.startsWith("//")) {
-                        match = "https:" + match;
-                    }
+                    if (match.startsWith("//")) match = "https:" + match;
 
                     const url = new URL(match);
-
                     if (url.hostname !== "image.tmdb.org") continue;
 
                     const parsed = url.pathname.match(
-                        /\/t\/p\/(w500|w1280|w1920)\/([^/]+)$/i
+                        /\\/t\\/p\\/(w500|w1280|w1920)\\/([^/]+)$/i
                     );
 
                     if (!parsed) continue;
 
                     const size = parsed[1].toLowerCase();
                     const filename = parsed[2];
-                    const isPNG = /\.png$/i.test(filename);
+                    const isPNG = /\\.png$/i.test(filename);
 
                     let type = null;
 
@@ -164,9 +144,18 @@ registerParser({
 
                     if (!type) continue;
 
-                    const titleMatch =
-                        cleanTitle(context).toLowerCase() ===
-                        title.toLowerCase();
+                    // Match title against distinct descriptive fields,
+                    // not the entire concatenated context string.
+                    const normalizedTitle = title.toLowerCase();
+                    const fields = String(context)
+                        .toLowerCase()
+                        .split(/[|,;]+/)
+                        .map(value => value.trim());
+
+                    const titleMatch = fields.some(field =>
+                        field === normalizedTitle ||
+                        field.includes(normalizedTitle)
+                    );
 
                     const previous = images.get(url.href);
 
@@ -174,10 +163,8 @@ registerParser({
                         url: url.href,
                         size,
                         type,
-                        titleMatch:
-                            titleMatch || previous?.titleMatch || false
+                        titleMatch: titleMatch || previous?.titleMatch || false
                     });
-
                 } catch (_) {}
             }
         }
@@ -189,16 +176,18 @@ registerParser({
             add(resource.name);
         }
 
-        // Actual page images.
+        // Actual page images. Keep metadata fields separated by delimiters.
         document.querySelectorAll("img, source").forEach(el => {
             const context = [
                 el.alt,
                 el.title,
-                el.className,
+                typeof el.className === "string" ? el.className : "",
                 el.id,
-                el.parentElement?.className,
-                el.parentElement?.id
-            ].join(" ");
+                el.parentElement?.getAttribute("aria-label"),
+                typeof el.parentElement?.className === "string"
+                    ? el.parentElement.className
+                    : ""
+            ].filter(Boolean).join(" | ");
 
             add(el.currentSrc, context);
             add(el.src, context);
@@ -222,12 +211,11 @@ registerParser({
 
     const logos = tmdbImages
         .filter(img => img.type === "logo")
-        .sort((a, b) =>
-            Number(b.titleMatch) - Number(a.titleMatch)
-        );
+        .sort((a, b) => Number(b.titleMatch) - Number(a.titleMatch));
 
-    const backdrops = tmdbImages
-        .filter(img => img.type === "backdrop");
+    const backdrops = tmdbImages.filter(
+        img => img.type === "backdrop"
+    );
 
     let selectedArtwork =
         logos.find(img => img.titleMatch) ||
@@ -236,10 +224,10 @@ registerParser({
         backdrops.find(img => img.size === "w1920") ||
         null;
 
-    // Verified Dexter logo fallback.
+    // Known official Dexter: Resurrection logo fallback.
     if (
-        !logos.length &&
-        /dexter\s*:\s*resurrection/i.test(title)
+        !selectedArtwork &&
+        /dexter\\s*:\\s*resurrection/i.test(title)
     ) {
         selectedArtwork = {
             url: "https://image.tmdb.org/t/p/w500/8vN1JzNMVIVuyhEyGkKwr0NhMPh.png",
@@ -260,11 +248,9 @@ registerParser({
         params.set("fit", mode);
 
         if (mode === "contain") {
-            // Preserve complete logo without cropping.
             params.set("cbg", "18151f");
             params.set("output", "png");
         } else {
-            // Fill the square for backdrop fallback.
             params.set("a", "attention");
             params.set("output", "jpg");
         }
@@ -277,9 +263,7 @@ registerParser({
     if (selectedArtwork) {
         image = makeSquareArtwork(
             selectedArtwork.url,
-            selectedArtwork.type === "logo"
-                ? "contain"
-                : "cover"
+            selectedArtwork.type === "logo" ? "contain" : "cover"
         );
     }
 
@@ -289,8 +273,6 @@ registerParser({
 
     let source = "BingeBang";
 
-    // TV: episode information.
-    // Movies: hide second line.
     let artist = isSeries
         ? (episodeInfo || "-1")
         : "-1";
@@ -302,7 +284,6 @@ registerParser({
     // ====================================
 
     // Auto Detect Video Status: ENABLED
-
     let timePassed = null;
     let duration = null;
 
