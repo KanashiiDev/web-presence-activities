@@ -2,7 +2,7 @@ registerParser({
   id: "rwr97_bingebang.sx_bW92aWUvcG",
   domain: ["bingebang.sx", "bingebang.st", "bingebang.club", "bingebang.to", "bingebang.pw"],
   authors: ["rwr97"],
-  authorsLinks: ["https://steamcommunity.com/id/rwr97/"],
+  authorsLinks: ["https://github.com/rwr97"],
   title: "BingeBang",
   version: "1.6.1",
   description: "Movie and TV playback detection",
