@@ -50,23 +50,23 @@ registerParser({
         if (!value) return "";
 
         return value
-            .replace(/\\s*[·|•]\\s*(?:Player|BingeBang)\\b.*$/i, "")
-            .replace(/\\s*[-–—]\\s*(?:Player|BingeBang)\\b.*$/i, "")
+            .replace(/\s*[·|•]\s*(?:Player|BingeBang)\b.*$/i, "")
+            .replace(/\s*[-–—]\s*(?:Player|BingeBang)\b.*$/i, "")
             .replace(
-                /\\s*[·|•-]?\\s*(?:S\\d{1,2}\\s*E\\d{1,3}|\\d{1,2}x\\d{1,3})\\s*$/i,
+                /\s*[·|•-]?\s*(?:S\d{1,2}\s*E\d{1,3}|\d{1,2}x\d{1,3})\s*$/i,
                 ""
             )
-            .replace(/\\s+Season\\s+\\d+\\s+Episode\\s+\\d+.*$/i, "")
-            .replace(/[\\s·|•–—]+$/g, "")
-            .replace(/\\s+/g, " ")
+            .replace(/\s+Season\s+\d+\s+Episode\s+\d+.*$/i, "")
+            .replace(/[\s·|•–—]+$/g, "")
+            .replace(/\s+/g, " ")
             .trim();
     }
 
     const path = location.pathname;
-    const isSeries = /^\\/tv\\/play\\//i.test(path);
+    const isSeries = /^\/tv\/play\//i.test(path);
 
     const slugMatch = path.match(
-        /^\\/(?:movie|tv)\\/play\\/([^/]+)/i
+        /^\/(?:movie|tv)\/play\/([^/]+)/i
     );
 
     const slug = slugMatch?.[1] || "";
@@ -74,7 +74,7 @@ registerParser({
     const fallbackTitle = slug
         .replace(/-[a-z0-9]{5,}$/i, "")
         .replace(/-/g, " ")
-        .replace(/\\b\\w/g, c => c.toUpperCase());
+        .replace(/\b\w/g, c => c.toUpperCase());
 
     const rawTitle =
         document.querySelector("h1")?.textContent ||
@@ -89,7 +89,7 @@ registerParser({
     // ====================================
 
     const episodeMatch = path.match(
-        /^\\/tv\\/play\\/[^/]+\\/(\\d{1,2})\\/(\\d{1,3})\\/?$/i
+        /^\/tv\/play\/[^/]+\/(\d{1,2})\/(\d{1,3})\/?$/i
     );
 
     let episodeInfo = "";
@@ -111,7 +111,7 @@ registerParser({
             if (!raw) return;
 
             const matches = String(raw).match(
-                /(?:https?:)?\\/\\/image\\.tmdb\\.org\\/t\\/p\\/(?:w500|w1280|w1920)\\/[^\\s"'<>),;]+/gi
+                /(?:https?:)?\/\/image\.tmdb\.org\/t\/p\/(?:w500|w1280|w1920)\/[^\s"'<>),;]+/gi
             ) || [];
 
             for (let match of matches) {
@@ -122,14 +122,14 @@ registerParser({
                     if (url.hostname !== "image.tmdb.org") continue;
 
                     const parsed = url.pathname.match(
-                        /\\/t\\/p\\/(w500|w1280|w1920)\\/([^/]+)$/i
+                        /\/t\/p\/(w500|w1280|w1920)\/([^/]+)$/i
                     );
 
                     if (!parsed) continue;
 
                     const size = parsed[1].toLowerCase();
                     const filename = parsed[2];
-                    const isPNG = /\\.png$/i.test(filename);
+                    const isPNG = /\.png$/i.test(filename);
 
                     let type = null;
 
@@ -227,7 +227,7 @@ registerParser({
     // Known official Dexter: Resurrection logo fallback.
     if (
         !selectedArtwork &&
-        /dexter\\s*:\\s*resurrection/i.test(title)
+        /dexter\s*:\s*resurrection/i.test(title)
     ) {
         selectedArtwork = {
             url: "https://image.tmdb.org/t/p/w500/8vN1JzNMVIVuyhEyGkKwr0NhMPh.png",
